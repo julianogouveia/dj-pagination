@@ -29,7 +29,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+from distutils.version import StrictVersion
+from django import get_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import Paginator, InvalidPage
@@ -43,10 +44,16 @@ from django.template import (
     loader,
 )
 
-try:
-    from django.template.base import TOKEN_BLOCK
-except ImportError:     # Django < 1.8
+version = get_version()
+
+if version < StrictVersion('1.8.0'):
     from django.template import TOKEN_BLOCK
+elif version >= StrictVersion('1.8.0') and version < StrictVersion('2.1.0'):
+    from django.template.base import TOKEN_BLOCK
+else:
+    from django.template.base import TokenType
+    TOKEN_BLOCK = TokenType.BLOCK
+    
 
 from django.template.loader import select_template
 from django.utils.text import unescape_string_literal
